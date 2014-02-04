@@ -37,14 +37,13 @@
         };
 
 
-
+        //Changes dates to numerals
         function niceDates () {
           var date = streams.home[streams.home.length-1].created_at.toString().split(' ');
-          var temp = date[1];
-          //var nice = date[1].toString() + ' ' + date[2].toString();
+          var month = date[1];
           var result = '';
           for (key in converters) {
-            if (converters[temp] === converters[key]) {
+            if (converters[month] === converters[key]) {
               result += converters[key];
             }
           }
@@ -59,6 +58,7 @@
           $('body').empty();
           while(index >= streams.home.length-10){
             var tweet = streams.home[index];
+            var link = 'http://www.twitter.com\/' + tweet.user + '\/';   
             var $tweet = $('<div></div>');
             $tweet.text(niceDates() + ' ' + '@' + tweet.user + ': ' + tweet.message);
             $tweet.appendTo($body);
@@ -69,7 +69,7 @@
         //sets milisecond interval of running f'n
 
         //Command to rerun refresh function to get new tweets
-        //window.setInterval(showTweets,750)
+        //window.setInterval(showTweets,200)
 
     </script>
   </body>
