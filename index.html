@@ -25,22 +25,42 @@
       });
 
         //variables
-        var $body = $('body'), index;
-        $body.html('');
+        var $body = $('body');
+        var index;
+        var converters = {'Jan':'01','Feb':'02','Mar':'03','Apr':'04','May':'05','Jun':'06','Jul':'07','Aug':'08','Sep':'09','Oct':'10','Nov':'11','Dec':'12'};
+
 
 
         //Function to refresh data assigned to variable streams
         function refresh () {
           index = streams.home.length - 1;
+        };
+
+
+
+        function niceDates () {
+          var date = streams.home[streams.home.length-1].created_at.toString().split(' ');
+          var temp = date[1];
+          //var nice = date[1].toString() + ' ' + date[2].toString();
+          var result = '';
+          for (key in converters) {
+            if (converters[temp] === converters[key]) {
+              result += converters[key];
+            }
+          }
+          return result += '\/' + date[2] + '\/' + date[3].slice(2,4) + ' ' + date[4];
         }
 
-        var index = streams.home.length - 1;
+
+        //$body.html('');
+
         function showTweets () {
+          refresh();
           $('body').empty();
-          while(index >= 0){
+          while(index >= streams.home.length-10){
             var tweet = streams.home[index];
             var $tweet = $('<div></div>');
-            $tweet.text(tweet.created_at + '@' + tweet.user + ': ' + tweet.message);
+            $tweet.text(niceDates() + ' ' + '@' + tweet.user + ': ' + tweet.message);
             $tweet.appendTo($body);
             index -= 1;
           };
@@ -49,8 +69,7 @@
         //sets milisecond interval of running f'n
 
         //Command to rerun refresh function to get new tweets
-        window.setInterval(refresh,1000)
-        window.setInterval(showTweets,3000)
+        //window.setInterval(showTweets,750)
 
     </script>
   </body>
