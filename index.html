@@ -48,38 +48,23 @@
   <body>
     <h2>Twittler</h2>
     <script>
-
       $(document).ready(function(){
-        //var $body = $('body');
-        //$body.html('');
-
-        //var index = streams.home.length - 1;
-        //while(index >= 0){
-          //var tweet = streams.home[index];
-          //var $tweet = $('<div></div>');
-          //$tweet.text(tweet.created_at + '@' + tweet.user + ': ' + tweet.message);
-          //$tweet.appendTo($body);
-          //index -= 1;
-        //}
-
-      //End of doc.ready f'n
+        //anything??????????????????????????????????????
       });
 
-        //variables
-        var $body = $('body');
-        var index;
-        var converters = {'Jan':'01','Feb':'02','Mar':'03','Apr':'04','May':'05','Jun':'06','Jul':'07','Aug':'08','Sep':'09','Oct':'10','Nov':'11','Dec':'12'};
-
-
+      //Variables
+      var $body = $('body');
+      var index;
+      var converters = {'Jan':'01','Feb':'02','Mar':'03','Apr':'04','May':'05','Jun':'06','Jul':'07','Aug':'08','Sep':'09','Oct':'10','Nov':'11','Dec':'12'};
+      var twittler = {
 
         //Function to refresh data assigned to variable streams
-        function refresh () {
+        refresh: function () {
           index = streams.home.length - 1;
-        };
-
+        },
 
         //Changes dates to numerals
-        function niceDates () {
+        niceDates: function () {
           var date = streams.home[streams.home.length-1].created_at.toString().split(' ');
           var month = date[1];
           var result = '';
@@ -89,13 +74,11 @@
             }
           }
           return result += '\/' + date[2] + '\/' + date[3].slice(2,4) + ' ' + date[4];
-        }
+        },
 
-
-        //$body.html('');
-
-        function showTweets () {
-          refresh();
+        //Displays tweets
+        showTweets: function () {
+          twittler.refresh();
           $('div').remove();
           while(index >= streams.home.length-10){
             var tweet = streams.home[index];
@@ -105,22 +88,19 @@
              text: '@'+tweet.user,
              title: '@'+tweet.user,
              href: link
-            }).addClass('username');
+           }).addClass('username');
             var $message = $('<ul></ul>').addClass('tweet');
             var $dateAndTime = $('<li></li>').addClass('time');
             $username.appendTo($tweet);
             $message.text(tweet.message).appendTo($tweet);
-            $dateAndTime.text(niceDates()).appendTo($message);
+            $dateAndTime.text(twittler.niceDates()).appendTo($message);
             $tweet.appendTo($body);
             index -= 1;
           };
-        };
-
-        //sets milisecond interval of running f'n
-
-        //Command to rerun refresh function to get new tweets
-        //window.setInterval(showTweets,200)
-
+        }
+      };
+      //Command to rerun showTweets function to refresh timeline
+      //window.setInterval(twittler.showTweets,200)
     </script>
   </body>
 </html>
