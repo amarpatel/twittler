@@ -3,9 +3,50 @@
   <head>
     <script src="jquery.js"></script>
     <script src="data_generator.js"></script>
-    <style type="text/css"></style>
+    <style type="text/css">
+    h2 {
+      text-align: center;
+    }
+    div {
+      background-color: rgb(204,214,221);
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      text-align:left;
+      border: 2px solid;
+      border-color: rgb(41,47,51);
+      border-radius: 7px;
+      width: 480px;
+      height: 45px;
+
+    }
+    .time {
+      text-align: right;
+      position: relative;
+      top: -4px;
+      margin-right: 3px;
+      font-family: sans-serif;
+      font-size: 8pt;
+    }
+    .tweet {
+      margin-left: -24px;
+      list-style: none;
+      text-align: left;
+      position: relative;
+      top: -16px;
+    }
+    .username {
+      text-decoration: none;
+      color: rgb(85,172,238);
+      font-weight: bold;
+    }
+
+    </style>
+    <title>Twittler</title>
   </head>
   <body>
+    <h2>Twittler</h2>
     <script>
 
       $(document).ready(function(){
@@ -55,12 +96,21 @@
 
         function showTweets () {
           refresh();
-          $('body').empty();
+          $('div').remove();
           while(index >= streams.home.length-10){
             var tweet = streams.home[index];
             var link = 'http://www.twitter.com\/' + tweet.user + '\/';   
             var $tweet = $('<div></div>');
-            $tweet.text(niceDates() + ' ' + '@' + tweet.user + ': ' + tweet.message);
+            var $username = $('<a>',{
+             text: '@'+tweet.user,
+             title: '@'+tweet.user,
+             href: link
+            }).addClass('username');
+            var $message = $('<ul></ul>').addClass('tweet');
+            var $dateAndTime = $('<li></li>').addClass('time');
+            $username.appendTo($tweet);
+            $message.text(tweet.message).appendTo($tweet);
+            $dateAndTime.text(niceDates()).appendTo($message);
             $tweet.appendTo($body);
             index -= 1;
           };
