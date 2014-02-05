@@ -6,6 +6,7 @@
     <style type="text/css">
     h2 {
       text-align: center;
+      color: rgb(85,172,238);
     }
     div {
       background-color: rgb(204,214,221);
@@ -53,19 +54,20 @@
       });
 
       //Variables
-      var $body = $('body');
+      var home = streams.home;
       var index;
       var converters = {'Jan':'01','Feb':'02','Mar':'03','Apr':'04','May':'05','Jun':'06','Jul':'07','Aug':'08','Sep':'09','Oct':'10','Nov':'11','Dec':'12'};
       var twittler = {
 
         //Function to refresh data assigned to variable streams
         refresh: function () {
-          index = streams.home.length - 1;
+          index = home.length - 1;
         },
 
         //Changes dates to numerals
         niceDates: function () {
-          var date = streams.home[streams.home.length-1].created_at.toString().split(' ');
+          var date = home[home.length-1].created_at.toString().split(' ');
+          var time = date[4];
           var month = date[1];
           var result = '';
           for (key in converters) {
@@ -73,34 +75,48 @@
               result += converters[key];
             }
           }
-          return result += '\/' + date[2] + '\/' + date[3].slice(2,4) + ' ' + date[4];
+          //kept this line to verify twittler.niceTime()'s accuracy
+          //return result += '\/' + date[2] + '\/' + date[3].slice(2,4) + ' ' + date[4];
+          return result += '\/' + date[2] + '\/' + date[3].slice(2,4) + ' ' + twittler.niceTime(time);
+        },
+
+        //change time to 12 hour instead of 24 hour
+        niceTime: function (time) {
+          var timeArray = time.split(':'), time = '';
+          if (+timeArray[0] > 12) {
+            timeArray[0] = +timeArray[0] - 12;
+            timeArray.push('PM');
+          } else {
+            timeArray.push('AM');
+          };
+          return timeArray[0] + ':' + timeArray[1] + ':' + timeArray[2] + ' ' + timeArray[3];
+
         },
 
         //Displays tweets
         showTweets: function () {
           twittler.refresh();
           $('div').remove();
-          while(index >= streams.home.length-10){
-            var tweet = streams.home[index];
+          while(index >= home.length-10){
+            var tweet = home[index];
             var link = 'http://www.twitter.com\/' + tweet.user + '\/';   
             var $tweet = $('<div></div>');
             var $username = $('<a>',{
              text: '@'+tweet.user,
              title: '@'+tweet.user,
-             href: link
-           }).addClass('username');
+             href: link}).addClass('username');
             var $message = $('<ul></ul>').addClass('tweet');
             var $dateAndTime = $('<li></li>').addClass('time');
             $username.appendTo($tweet);
             $message.text(tweet.message).appendTo($tweet);
             $dateAndTime.text(twittler.niceDates()).appendTo($message);
-            $tweet.appendTo($body);
+            $tweet.appendTo($('body'));
             index -= 1;
           };
         }
       };
       //Command to rerun showTweets function to refresh timeline
-      //window.setInterval(twittler.showTweets,200)
+      window.setInterval(twittler.showTweets,200)
     </script>
   </body>
 </html>
