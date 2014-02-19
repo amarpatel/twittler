@@ -1,122 +1,136 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <script src="jquery.js"></script>
-    <script src="data_generator.js"></script>
-    <style type="text/css">
-    h2 {
-      text-align: center;
-      color: rgb(85,172,238);
-    }
-    div {
-      background-color: rgb(204,214,221);
-      margin-left: auto;
-      margin-right: auto;
-      margin-top: 10px;
-      margin-bottom: 10px;
-      text-align:left;
-      border: 2px solid;
-      border-color: rgb(41,47,51);
-      border-radius: 7px;
-      width: 480px;
-      height: 45px;
+<head>
+  <script src="jquery.js"></script>
+  <script src="data_generator.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js"></script>
+  <style type="text/css">
+  body {
+    background-color: rgb(102,117,127);
+  }
+  .title {
+    text-align: center;
+    color: rgb(85,172,238);
+    margin-bottom: -15px;
+    margin-top: -5px;
+  }
+  .visitorButton {
+    text-align: center;
+  }
+  button {
+    margin-top: 13px;
+    margin-bottom: -3px;
+    font-size: small;
+    background-color: rgb(85,172,238);
+    color: #ffffff;
+    border-radius: 5px;
+    border: 1px solid rgb(85,172,238);
+    cursor: pointer;
+  }
+  .indivTweet {
+    background-color: rgb(204,214,221);
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 8px;
+    margin-bottom: 10px;
+    text-align:left;
+    border: 2px solid;
+    border-color: rgb(41,47,51);
+    border-radius: 7px;
+    width: 480px;
+    height: 45px;
+  }
+  .myTweet {
+    background-color: rgb(204,214,221);
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 8px;
+    margin-bottom: 10px;
+    text-align:left;
+    border: 2px solid;
+    border-color: rgb(85,172,238);
+    border-radius: 7px;
+    width: 480px;
+    height: 45px;
+  }
+  .username {
+    text-decoration: none;
+    color: rgb(85,172,238);
+    font-weight: bold;
+  }
+  .tweetText {
+    margin-left: -24px;
+    text-align: left;
+    position: relative;
+    top: -18px;
+  }
+  .timeCreated {
+    list-style: none;
+    text-align: right;
+    position: relative;
+    top: -36px;
+    margin-right: 3px;
+    font-family: sans-serif;
+    font-size: 8pt;
+  }
+  </style>
+  <title>Twittler</title>
+</head>
+<body>
+  <h2 class='title'>Twittler</h2>
+  <div class='visitorButton'>
+    <button>Click here to send a tweet!</button>
+  </div>
+  <script>
+  $(document).ready(function(){
+    $('button').on('click',twittler.newTweet);
+  });
+  var twittler = {
+    tweets: function () {
+      var index = streams.home.length - 1;
 
-    }
-    .time {
-      text-align: right;
-      position: relative;
-      top: -2px;
-      margin-right: 3px;
-      font-family: sans-serif;
-      font-size: 8pt;
-    }
-    .tweet {
-      margin-left: -24px;
-      list-style: none;
-      text-align: left;
-      position: relative;
-      top: -18px;
-    }
-    .username {
-      text-decoration: none;
-      color: rgb(85,172,238);
-      font-weight: bold;
-    }
-
-    </style>
-    <title>Twittler</title>
-  </head>
-  <body>
-    <h2>Twittler</h2>
-    <script>
-      $(document).ready(function(){
-        //anything??????????????????????????????????????
-      });
-
-      //Variables
-      var home = streams.home;
-      var index;
-      var converters = {'Jan':'01','Feb':'02','Mar':'03','Apr':'04','May':'05','Jun':'06','Jul':'07','Aug':'08','Sep':'09','Oct':'10','Nov':'11','Dec':'12'};
-      var twittler = {
-
-        //Function to refresh data assigned to variable streams
-        refresh: function () {
-          index = home.length - 1;
-        },
-
-        //Changes dates to numerals
-        niceDates: function () {
-          var date = home[home.length-1].created_at.toString().split(' ');
-          var time = date[4];
-          var month = date[1];
-          var result = '';
-          for (key in converters) {
-            if (converters[month] === converters[key]) {
-              result += converters[key];
-            }
-          }
-          //kept this line to verify twittler.niceTime()'s accuracy
-          //return result += '\/' + date[2] + '\/' + date[3].slice(2,4) + ' ' + date[4];
-          return result += '\/' + date[2] + '\/' + date[3].slice(2,4) + ' ' + twittler.niceTime(time);
-        },
-
-        //change time to 12 hour instead of 24 hour
-        niceTime: function (time) {
-          var timeArray = time.split(':'), time = '';
-          if (+timeArray[0] > 12) {
-            timeArray[0] = +timeArray[0] - 12;
-            timeArray.push('PM');
-          } else {
-            timeArray.push('AM');
-          };
-          return timeArray[0] + ':' + timeArray[1] + ':' + timeArray[2] + ' ' + timeArray[3];
-
-        },
-
-        //Displays tweets
-        showTweets: function () {
-          twittler.refresh();
-          $('div').remove();
-          while(index >= home.length-10){
-            var tweet = home[index];
-            var link = 'http://www.twitter.com\/' + tweet.user + '\/';   
+          //User limit to set # of refreshed tweets
+          var limit = index - 9;
+          //Removes old tweets
+          $('.indivTweet').remove();
+          $('.myTweet').remove();
+          //Adds new tweets
+          while(index >= limit){
+            var tweet = streams.home[index];
             var $tweet = $('<div></div>');
-            var $username = $('<a>',{
-             text: '@'+tweet.user,
-             title: '@'+tweet.user,
-             href: link}).addClass('username');
-            var $message = $('<ul></ul>').addClass('tweet');
-            var $dateAndTime = $('<li></li>').addClass('time');
-            $username.appendTo($tweet);
-            $message.text(tweet.message).appendTo($tweet);
-            $dateAndTime.text(twittler.niceDates()).appendTo($message);
+            $tweet.addClass('indivTweet');
+            //Adds "human-friendly" time
+            var createdAt = moment(tweet.created_at).fromNow();
+            var $msg = $('<ul></ul>');
+            var $timestamp = $('<li></li>');
+            var link = 'http://www.twitter.com\/' + tweet.user + '\/';
+            var $username = $('<a>',{text: '@'+tweet.user, title: '@'+tweet.user, href: link});
+            //Adds different class to user's tweets
+            if (tweet.user !== "shawndrost" && tweet.user !== "sharksforcheap"  && tweet.user !== "mracus"  && tweet.user !== "douglascalhoun") {
+             $tweet.removeClass('indivTweet').addClass('myTweet');
+           }
+           $username.addClass('username').appendTo($tweet);
+           $msg.text(tweet.message).addClass('tweetText').appendTo($tweet);
+           $timestamp.text(createdAt).addClass('timeCreated').appendTo($tweet);    
             $tweet.appendTo($('body'));
             index -= 1;
-          };
+          }
+        },
+        newTweet: function () {
+          var visitor, visitorTweet = {};
+          //Prompts user for username and corrects for appropriate characters
+          visitor = prompt('What\'s your twitter handle?').match(/[A-Za-z0-9]/g);
+          visitor = (visitor === null) ? 'Anonymous' : visitor.join('');
+          //Prompts user for message
+          visitorTweet.message = prompt('What do you want to say?','Enter tweet here.');
+          //Adds user's information to existing data structure
+          visitorTweet.user = visitor;
+          visitorTweet.created_at = new Date(); 
+          streams.users[visitorTweet.user] = visitorTweet;
+          streams.home.push(visitorTweet);
         }
       };
-      //Command to rerun showTweets function to refresh timeline
-      //window.setInterval(twittler.showTweets,200)
-    </script>
-  </body>
-</html>
+      window.setInterval(twittler.tweets,1000)
+      </script>
+    </body>
+    </html>
