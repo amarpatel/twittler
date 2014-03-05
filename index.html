@@ -11,15 +11,13 @@
   .title {
     text-align: center;
     color: rgb(85,172,238);
-    margin-bottom: -15px;
-    margin-top: -5px;
+    margin: -5px 0 -15px;
   }
   .visitorButton {
     text-align: center;
   }
   button {
-    margin-top: 13px;
-    margin-bottom: -3px;
+    margin: 13px 0 -3px;
     font-size: small;
     background-color: rgb(85,172,238);
     color: #ffffff;
@@ -29,10 +27,7 @@
   }
   .indivTweet {
     background-color: rgb(204,214,221);
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 8px;
-    margin-bottom: 10px;
+    margin: 8px auto 10px auto;
     text-align:left;
     border: 2px solid;
     border-color: rgb(41,47,51);
@@ -42,10 +37,7 @@
   }
   .myTweet {
     background-color: rgb(204,214,221);
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 8px;
-    margin-bottom: 10px;
+    margin: 8px auto 10px auto;
     text-align:left;
     border: 2px solid;
     border-color: rgb(85,172,238);
@@ -88,7 +80,6 @@
   var twittler = {
     tweets: function () {
       var index = streams.home.length - 1;
-
           //User limit to set # of refreshed tweets
           var limit = index - 9;
           //Removes old tweets
@@ -112,12 +103,12 @@
            $username.addClass('username').appendTo($tweet);
            $msg.text(tweet.message).addClass('tweetText').appendTo($tweet);
            $timestamp.text(createdAt).addClass('timeCreated').appendTo($tweet);    
-            $tweet.appendTo($('body'));
-            index -= 1;
-          }
-        },
-        newTweet: function () {
-          var visitor, visitorTweet = {};
+           $tweet.appendTo($('body'));
+           index -= 1;
+         }
+       },
+       newTweet: function () {
+        var visitor, visitorTweet = {};
           //Prompts user for username and corrects for appropriate characters
           visitor = prompt('What\'s your twitter handle?').match(/[A-Za-z0-9]/g);
           visitor = (visitor === null) ? 'Anonymous' : visitor.join('');
