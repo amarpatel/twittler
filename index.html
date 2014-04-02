@@ -85,7 +85,7 @@
     $('.visitorButtonClick').on('click', twittler.newTweet);
   });
   var twittler = {
-    runSorted: false,
+    sortedParameter: undefined,
     tweets: function() {
       var self = this;
       var index = streams.home.length - 1;
@@ -113,9 +113,10 @@
         }
         $username.addClass('username').appendTo($tweet);
         $('button').on('click', function() {
-          var user = $(this).text();
-          user = user.substr(1, user.length);
-          return _.once(self.sorted(user));
+          var user = $(this).text()
+          user = user.substr(1,user.length);
+          twittler.sortedParameter = user;
+          return twittler.sorted(twittler.sortedParameter);
         });
         $msg.text(tweet.message).addClass('tweetText').appendTo($tweet);
         $timestamp.text(createdAt).addClass('timeCreated').appendTo($tweet);
@@ -124,6 +125,9 @@
       };
     },
     sorted: function(username) {
+      if (username === undefined || username === "lick here to send a tweet!") {
+        return twittler.tweets();
+      }
       var self = this;
       var index = streams.home.length - 1;
       //User limit to set # of refreshed tweets
@@ -152,7 +156,8 @@
           }
           $username.addClass('username').appendTo($tweet);
           $('button').on('click', function() {
-            return self.tweets();
+            twittler.sortedParameter = undefined;
+            twittler.sorted()
           });
           $msg.text(tweet.message).addClass('tweetText').appendTo($tweet);
           $timestamp.text(createdAt).addClass('timeCreated').appendTo($tweet);
@@ -177,11 +182,13 @@
       visitorTweet.created_at = new Date();
       streams.users[visitorTweet.user] = visitorTweet;
       streams.home.push(visitorTweet);
-      return twittler.tweets();
     }
   };
-  twittler.tweets();
-  //window.setInterval(twittler.tweets, 1000)
+  function runner () {
+    twittler.sorted.call(this,twittler.sortedParameter);
+    window.setInterval(runner, 2000);
+  }
+  runner();
   </script>
 </body>
 
