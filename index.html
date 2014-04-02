@@ -1,53 +1,59 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <script src="jquery.js"></script>
   <script src="data_generator.js"></script>
   <script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
   <style type="text/css">
   body {
-    background-color: rgb(102,117,127);
+    background-color: rgb(102, 117, 127);
   }
   .title {
     text-align: center;
-    color: rgb(85,172,238);
+    color: rgb(85, 172, 238);
     margin: -5px 0 -15px;
   }
   .visitorButton {
     text-align: center;
   }
-  button {
+  .visitorButtonClick {
     margin: 13px 0 -3px;
     font-size: small;
-    background-color: rgb(85,172,238);
+    background-color: rgb(85, 172, 238);
     color: #ffffff;
     border-radius: 5px;
-    border: 1px solid rgb(85,172,238);
+    border: 1px solid rgb(85, 172, 238);
     cursor: pointer;
   }
+  button {
+    font-size: small;
+    color: #ffffff;
+  }
   .indivTweet {
-    background-color: rgb(204,214,221);
+    background-color: rgb(204, 214, 221);
     margin: 8px auto 10px auto;
     text-align:left;
     border: 2px solid;
-    border-color: rgb(41,47,51);
+    border-color: rgb(41, 47, 51);
     border-radius: 7px;
     width: 480px;
     height: 45px;
   }
   .myTweet {
-    background-color: rgb(204,214,221);
+    background-color: rgb(204, 214, 221);
     margin: 8px auto 10px auto;
     text-align:left;
     border: 2px solid;
-    border-color: rgb(85,172,238);
+    border-color: rgb(85, 172, 238);
     border-radius: 7px;
     width: 480px;
     height: 45px;
   }
   .username {
     text-decoration: none;
-    color: rgb(85,172,238);
+    color: rgb(85, 172, 238);
     font-weight: bold;
   }
   .tweetText {
@@ -68,60 +74,115 @@
   </style>
   <title>Twittler</title>
 </head>
+
 <body>
   <h2 class='title'>Twittler</h2>
   <div class='visitorButton'>
-    <button>Click here to send a tweet!</button>
+    <button class='visitorButtonClick'>Click here to send a tweet!</button>
   </div>
   <script>
-  $(document).ready(function(){
-    $('button').on('click',twittler.newTweet);
+  $(document).ready(function() {
+    $('.visitorButtonClick').on('click', twittler.newTweet);
   });
   var twittler = {
-    tweets: function () {
+    runSorted: false,
+    tweets: function() {
+      var self = this;
       var index = streams.home.length - 1;
-          //User limit to set # of refreshed tweets
-          var limit = index - 9;
-          //Removes old tweets
-          $('.indivTweet').remove();
-          $('.myTweet').remove();
-          //Adds new tweets
-          while(index >= limit){
-            var tweet = streams.home[index];
-            var $tweet = $('<div></div>');
-            $tweet.addClass('indivTweet');
-            //Adds "human-friendly" time
-            var createdAt = moment(tweet.created_at).fromNow();
-            var $msg = $('<ul></ul>');
-            var $timestamp = $('<li></li>');
-            var link = 'http://www.twitter.com\/' + tweet.user + '\/';
-            var $username = $('<a>',{text: '@'+tweet.user, title: '@'+tweet.user, href: link});
-            //Adds different class to user's tweets
-            if (tweet.user !== "shawndrost" && tweet.user !== "sharksforcheap"  && tweet.user !== "mracus"  && tweet.user !== "douglascalhoun") {
-             $tweet.removeClass('indivTweet').addClass('myTweet');
-           }
-           $username.addClass('username').appendTo($tweet);
-           $msg.text(tweet.message).addClass('tweetText').appendTo($tweet);
-           $timestamp.text(createdAt).addClass('timeCreated').appendTo($tweet);    
-           $tweet.appendTo($('body'));
-           index -= 1;
-         }
-       },
-       newTweet: function () {
-        var visitor, visitorTweet = {};
-          //Prompts user for username and corrects for appropriate characters
-          visitor = prompt('What\'s your twitter handle?').match(/[A-Za-z0-9]/g);
-          visitor = (visitor === null) ? 'Anonymous' : visitor.join('');
-          //Prompts user for message
-          visitorTweet.message = prompt('What do you want to say?','Enter tweet here.');
-          //Adds user's information to existing data structure
-          visitorTweet.user = visitor;
-          visitorTweet.created_at = new Date(); 
-          streams.users[visitorTweet.user] = visitorTweet;
-          streams.home.push(visitorTweet);
+      //User limit to set # of refreshed tweets
+      var limit = index - 9;
+      //Removes old tweets
+      $('.indivTweet').remove();
+      $('.myTweet').remove();
+      //Adds new tweets
+      while (index >= limit) {
+        var tweet = streams.home[index];
+        var $tweet = $('<div></div>');
+        $tweet.addClass('indivTweet');
+        //Adds "human-friendly" time
+        var createdAt = moment(tweet.created_at).fromNow();
+        var $msg = $('<ul></ul>');
+        var $timestamp = $('<li></li>');
+        var link = 'http://www.twitter.com\/' + tweet.user + '\/';
+        var $username = $('<button>', {
+          text: '@' + tweet.user
+        });
+        //Adds different class to user's tweets
+        if (tweet.user !== "shawndrost" && tweet.user !== "sharksforcheap" && tweet.user !== "mracus" && tweet.user !== "douglascalhoun") {
+          $tweet.removeClass('indivTweet').addClass('myTweet');
         }
+        $username.addClass('username').appendTo($tweet);
+        $('button').on('click', function() {
+          var user = $(this).text();
+          user = user.substr(1, user.length);
+          return _.once(self.sorted(user));
+        });
+        $msg.text(tweet.message).addClass('tweetText').appendTo($tweet);
+        $timestamp.text(createdAt).addClass('timeCreated').appendTo($tweet);
+        $tweet.appendTo($('body'));
+        index -= 1;
       };
-      window.setInterval(twittler.tweets,1000)
-      </script>
-    </body>
-    </html>
+    },
+    sorted: function(username) {
+      var self = this;
+      var index = streams.home.length - 1;
+      //User limit to set # of refreshed tweets
+      var limit = 0;
+      //Removes old tweets
+      $('.indivTweet').remove();
+      $('.myTweet').remove();
+      //Adds new tweets
+      while (limit <= 10) {
+        if (streams.home[index] && streams.home[index].user === username) {
+          var tweet = streams.home[index];
+          var $tweet = $('<div></div>');
+          $tweet.addClass('indivTweet');
+          //Adds "human-friendly" time
+          var createdAt = moment(tweet.created_at).fromNow();
+          var $msg = $('<ul></ul>');
+          var $timestamp = $('<li></li>');
+          var link = 'http://www.twitter.com\/' + tweet.user + '\/';
+          // var $username = $('<a>',{text: '@'+tweet.user, title: '@'+tweet.user, href: link});
+          var $username = $('<button>', {
+            text: '@' + tweet.user
+          });
+          //Adds different class to user's tweets
+          if (tweet.user !== "shawndrost" && tweet.user !== "sharksforcheap" && tweet.user !== "mracus" && tweet.user !== "douglascalhoun") {
+            $tweet.removeClass('indivTweet').addClass('myTweet');
+          }
+          $username.addClass('username').appendTo($tweet);
+          $('button').on('click', function() {
+            return self.tweets();
+          });
+          $msg.text(tweet.message).addClass('tweetText').appendTo($tweet);
+          $timestamp.text(createdAt).addClass('timeCreated').appendTo($tweet);
+          $tweet.appendTo($('body'));
+          limit++;
+          index -= 1;
+        } else {
+          index -= 1;
+          limit = limit + 0.01;
+        };
+      }
+    },
+    newTweet: function() {
+      var visitor, visitorTweet = {};
+      //Prompts user for username and corrects for appropriate characters
+      visitor = prompt('What\'s your twitter handle?').match(/[A-Za-z0-9]/g);
+      visitor = (visitor === null) ? 'Anonymous' : visitor.join('');
+      //Prompts user for message
+      visitorTweet.message = prompt('What do you want to say?', 'Enter tweet here.');
+      //Adds user's information to existing data structure
+      visitorTweet.user = visitor;
+      visitorTweet.created_at = new Date();
+      streams.users[visitorTweet.user] = visitorTweet;
+      streams.home.push(visitorTweet);
+      return twittler.tweets();
+    }
+  };
+  twittler.tweets();
+  //window.setInterval(twittler.tweets, 1000)
+  </script>
+</body>
+
+</html>
