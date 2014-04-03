@@ -86,7 +86,6 @@
   var twittler = {
     sortedParameter: undefined,
     tweets: function(username) {
-      // username = 'shawndrost';
       var self = this;
       var index = streams.home.length - 1;
       //User limit to set # of refreshed tweets
@@ -103,8 +102,6 @@
           var createdAt = moment(tweet.created_at).fromNow();
           var $msg = $('<ul></ul>');
           var $timestamp = $('<li></li>');
-
-
           var $username = $('<button>', {
             text: '@' + tweet.user
           });
@@ -113,27 +110,26 @@
             $tweet.removeClass('indivTweet').addClass('myTweet');
           }
           $username.addClass('username').appendTo($tweet);
-
-
-
           $('button').on('click', function() {
             var user = $(this).text();
             if (user.charAt(0) === '@') {
               user = user.substr(1, user.length);
               twittler.sortedParameter = user;
-              return twittler.tweets(twittler.sortedParameter);
+              return runner();
             };
           });
           $msg.text(tweet.message).addClass('tweetText').appendTo($tweet);
           $timestamp.text(createdAt).addClass('timeCreated').appendTo($tweet);
           $tweet.appendTo($('#tweetsList'));
-          console.log(tweet.user);
           index -= 1;
-        }
+        };
       } else {
         var counter = 0;
         while (counter < 10) {
           var tweet = streams.home[index];
+          if (tweet === undefined) {
+            return true;
+          };
           if (username === tweet.user) {
             var $tweet = $('<div></div>');
             $tweet.addClass('indivTweet');
@@ -141,8 +137,6 @@
             var createdAt = moment(tweet.created_at).fromNow();
             var $msg = $('<ul></ul>');
             var $timestamp = $('<li></li>');
-
-
             var $username = $('<button>', {
               text: '@' + tweet.user
             });
@@ -153,22 +147,21 @@
             $username.addClass('username').appendTo($tweet);
             $('button').on('click', function() {
               twittler.sortedParameter = undefined;
-              return twittler.tweets();
+              return runner();
             });
             $msg.text(tweet.message).addClass('tweetText').appendTo($tweet);
             $timestamp.text(createdAt).addClass('timeCreated').appendTo($tweet);
             $tweet.appendTo($('#tweetsList'));
-            console.log(tweet.user)
             counter++;
-          }
+          };
           index -= 1;
         };
-      }
+      };
     },
     newTweet: function() {
-      var visitor, visitorTweet = {};
+      var visitorTweet = {};
       //Prompts user for username and corrects for appropriate characters
-      visitor = prompt('What\'s your twitter handle?').match(/[A-Za-z0-9]/g);
+      var visitor = prompt('What\'s your twitter handle?').match(/[A-Za-z0-9]/g);
       visitor = (visitor === null) ? 'Anonymous' : visitor.join('');
       //Prompts user for message
       visitorTweet.message = prompt('What do you want to say?', 'Enter tweet here.');
@@ -177,6 +170,7 @@
       visitorTweet.created_at = new Date();
       streams.users[visitorTweet.user] = visitorTweet;
       streams.home.push(visitorTweet);
+      console.log(streams.home.length - 1)
     }
   };
   var runner = function() {
