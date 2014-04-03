@@ -129,7 +129,7 @@
 
         $msg.text(tweet.message).addClass('tweetText').appendTo($tweet);
         $timestamp.text(createdAt).addClass('timeCreated').appendTo($tweet);
-        $tweet.appendTo($('body'));
+        $tweet.appendTo($('#tweetsList'));
         index -= 1;
       };
     },
@@ -211,6 +211,7 @@
   }
   //runner();
   </script>
+  <div id='tweetsList'></div>
 </body>
 
 </html>
